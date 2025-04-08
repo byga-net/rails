@@ -18,7 +18,8 @@ module ActionDispatch
         end
 
         def if_none_match_etags
-          (if_none_match ? if_none_match.split(/\s*,\s*/) : []).collect do |etag|
+          # Avoid regex backtracking on If-None-Match header [CVE-2023-22795]; see https://github.com/rails/rails/commit/8dc45950619a4c64d16fb9370570c996d201f9b0
+          (if_none_match ? if_none_match.split(",").each(&:strip!) : []).collect do |etag|
             etag.gsub(/^\"|\"$/, "")
           end
         end
